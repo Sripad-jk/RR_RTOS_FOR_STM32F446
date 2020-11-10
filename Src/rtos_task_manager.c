@@ -9,7 +9,7 @@
 #include "rtos_task_manager.h"
 #include "rtos_stack_handler.h"
 
-uint32_t Current_Task = 0;
+uint32_t EXECUTING_TASK = 0;
 
 //TaskHandlerPtr_type TASK_HANDLER_REFERENCE[MAX_TASK];
 
@@ -77,8 +77,8 @@ bool RTOS_Create_Task(uint32_t stack_size, TaskHandlerPtr_type task_handler_func
 |-------------------------------------------------------------*/
 void RTOS_Operate (void)
 {
-	Current_Task = Current_Task  + 1;
-	Current_Task = Current_Task % MAX_TASK;
+	EXECUTING_TASK = EXECUTING_TASK  + 1;
+	EXECUTING_TASK = EXECUTING_TASK % MAX_TASK;
 }
 
 /*------------------------------------------------------------
