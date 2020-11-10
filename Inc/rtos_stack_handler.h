@@ -27,7 +27,7 @@ bool Init_Task_Handlers( TaskHandlerPtr_type task_handler, uint8_t task_id);
 void Init_Task_Stack(void);
 __attribute__((naked)) void Init_Sched_Stack(uint32_t Scheduler_TOS);
 __attribute__((naked)) void Switch_SP_to_PSP(void);
-uint32_t Get_PSP_Value(void);
-void Save_PSP_Value(uint32_t current_task_PSP);
+uint32_t Get_New_Task_TOS(void);
+void Save_Current_Task_TOS(uint32_t current_task_tos);
 
 #endif /* RTOS_STACK_HANDLER_H_ */
