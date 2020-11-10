@@ -32,10 +32,10 @@ static bool print_t2 = true;
 static bool print_t3 = true;
 static bool print_t4 = true;
 
-int Task1_Handler(void);
-int Task2_Handler(void);
-int Task3_Handler(void);
-int Task4_Handler(void);
+void Task1_Handler(void);
+void Task2_Handler(void);
+void Task3_Handler(void);
+void Task4_Handler(void);
 
 int main(void)
 {
@@ -59,7 +59,7 @@ int main(void)
 	for(;;);
 }
 
-int Task1_Handler(void)
+void Task1_Handler(void)
 {
 
  while(1)
@@ -74,10 +74,9 @@ int Task1_Handler(void)
 	}
  }
 
- return 0;
 }
 
-int Task2_Handler(void)
+void Task2_Handler(void)
 {
 
  while(1)
@@ -92,10 +91,9 @@ int Task2_Handler(void)
 	}
  }
 
- return 0;
 }
 
-int Task3_Handler(void)
+void Task3_Handler(void)
 {
 
  while(1)
@@ -110,10 +108,10 @@ int Task3_Handler(void)
 	}
  }
 
- return 0;
+
 }
 
-int Task4_Handler(void)
+void Task4_Handler(void)
 {
 
  while(1)
@@ -127,6 +125,5 @@ int Task4_Handler(void)
 	   print_t3 = true;
 	}
  }
- return 0;
 
 }
