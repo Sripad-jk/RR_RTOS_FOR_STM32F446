@@ -24,5 +24,15 @@
 #define T3                 (2U)
 #define T4                 (3U)
 
+typedef enum
+{
+
+	TASK_DORMANT,
+	//TASK_READY,
+	TASK_RUNNING,
+	//TASK_PEND,
+	//TASK_INTERRUPTED,
+
+}RTOS_TASK_STATE_t;
 
 #endif /* RTOS_HEADSTART_H_ */
