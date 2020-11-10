@@ -57,7 +57,7 @@ __attribute__((naked)) void SysTick_Handler (void)
 	__asm volatile ("PUSH {LR}");
 
 	/* Save the current value of PSP which is in R0 above*/
-	__asm volatile("BL Save_PSP_Value");
+	__asm volatile("BL Save_Current_Task_TOS");
 
 
 	/*-- Retrieve the context of next task --*/
@@ -66,7 +66,7 @@ __attribute__((naked)) void SysTick_Handler (void)
 	__asm volatile("BL RTOS_Operate");
 
 	/* Get last stored PSP value */
-	__asm volatile("BL Get_PSP_Value");
+	__asm volatile("BL Get_New_Task_TOS");
 
 	/* Retrieve R4-R11 from the PSP */
 	__asm volatile("LDMIA R0!, {R4-R11}");
