@@ -10,7 +10,7 @@
 
 #include "rtos_headstart.h"
 
-typedef int (*TaskHandlerPtr_type) (void) ;
+typedef void (*TaskHandlerPtr_type) (void) ;
 
 bool RTOS_Create_Task(uint32_t stack_size, TaskHandlerPtr_type task_handler_func, uint8_t task_id);
 
