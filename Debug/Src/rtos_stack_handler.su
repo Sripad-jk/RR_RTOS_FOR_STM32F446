@@ -1,0 +1,7 @@
+rtos_stack_handler.c:33:29:Init_Sched_Stack	0	static,ignoring_inline_asm
+rtos_stack_handler.c:59:6:Create_Stack_Space	24	static
+rtos_stack_handler.c:91:6:Init_Task_Handlers	24	static
+rtos_stack_handler.c:127:6:Init_Task_Stack	16	static
+rtos_stack_handler.c:179:29:Switch_SP_to_PSP	0	static,ignoring_inline_asm
+rtos_stack_handler.c:219:10:Get_PSP_Value	4	static
+rtos_stack_handler.c:242:6:Save_PSP_Value	16	static

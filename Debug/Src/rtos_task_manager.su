@@ -1,0 +1,3 @@
+rtos_task_manager.c:41:6:RTOS_Create_Task	32	static
+rtos_task_manager.c:78:6:RTOS_Operate	4	static
+rtos_task_manager.c:100:6:RTOS_Start	8	static

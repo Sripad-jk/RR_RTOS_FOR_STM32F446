@@ -1,0 +1,6 @@
+exception_handler.c:12:6:Init_SysTick_Timer	32	static
+exception_handler.c:35:6:Enable_Exceptions	16	static
+exception_handler.c:45:29:SysTick_Handler	0	static,ignoring_inline_asm
+exception_handler.c:86:6:BusFault_Handler	8	static
+exception_handler.c:92:6:MemManage_Handler	8	static
+exception_handler.c:98:6:UsageFault_Handler	8	static
