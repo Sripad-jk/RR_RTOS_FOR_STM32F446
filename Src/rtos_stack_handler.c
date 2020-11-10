@@ -8,11 +8,19 @@
 #include "rtos_stack_handler.h"
 #include "rtos_task_manager.h"
 
+typedef struct
+{
+	uint32_t Task_TOS;
+	uint32_t Block_Count;
+	RTOS_TASK_STATE_t Task_State;
+	TaskHandlerPtr_type Task_Handler_Ref;
+
+}RTOS_TCB_t;
+
+RTOS_TCB_t Rtos_TCB[MAX_TASK];
+
 static uint32_t TASK_STACK_TOS = STACK_START_TASK;
-static uint32_t PSP_OF_TASKS[MAX_TASK];
-static TaskHandlerPtr_type TASK_HANDLER_PC_INIT[MAX_TASK];
-extern uint32_t TASK_HANDLERS[MAX_TASK];
-extern uint32_t Current_Task ;
+extern uint32_t EXECUTING_TASK ;
 
 /*------------------------------------------------------------
 |
@@ -62,7 +70,7 @@ bool Create_Stack_Space( uint32_t task_stack_size, uint8_t task_id)
 
 	if(task_id < MAX_TASK)
 	{
-		PSP_OF_TASKS[task_id] = TASK_STACK_TOS ;
+		Rtos_TCB[task_id].Task_TOS = TASK_STACK_TOS ;
 		TASK_STACK_TOS = TASK_STACK_TOS - task_stack_size;
 		successful_init = true;
 	}
@@ -94,7 +102,7 @@ bool Init_Task_Handlers( TaskHandlerPtr_type task_handler, uint8_t task_id)
 
 	if(task_id < MAX_TASK)
 	{
-		TASK_HANDLER_PC_INIT[task_id] = task_handler;
+		Rtos_TCB[task_id].Task_Handler_Ref = task_handler;
 		successful_init = true;
 	}
 
@@ -126,34 +134,37 @@ bool Init_Task_Handlers( TaskHandlerPtr_type task_handler, uint8_t task_id)
 |-------------------------------------------------------------*/
 void Init_Task_Stack(void)
 {
-	uint32_t *pPSP = NULL;
+	uint32_t *ptr_TASK_TOS = NULL;
 	uint8_t task_id = 0;
 	uint8_t reg_index = 0;
 
 	for(task_id = 0; task_id < MAX_TASK;  task_id++)
 	{
-		pPSP = (uint32_t *)PSP_OF_TASKS[task_id];
+		Rtos_TCB[task_id].Task_State = TASK_RUNNING;
 
-		pPSP--;
+		/* Load the Tasks Top of stack */
+		ptr_TASK_TOS = (uint32_t *)Rtos_TCB[task_id].Task_TOS;
+
+		ptr_TASK_TOS--;
 		/* Init xPSR */
-		*pPSP = DUMMY_xPSR; //(0x01000000U);
+		*ptr_TASK_TOS = DUMMY_xPSR; //(0x01000000U);
 
-		pPSP--;
+		ptr_TASK_TOS--;
 		/* Init PC */
-		*pPSP = (int)TASK_HANDLER_PC_INIT[task_id];
+		*ptr_TASK_TOS = (uint32_t)Rtos_TCB[task_id].Task_Handler_Ref;
 
-		pPSP--;
+		ptr_TASK_TOS--;
 		/* Init LR */
-		*pPSP = EXC_RETURN;
+		*ptr_TASK_TOS = EXC_RETURN;
 
 		for(reg_index = 0; reg_index < MAX_REG_STORE; reg_index++)
 		{
-			pPSP--;
+			ptr_TASK_TOS--;
 			/* Init R12, R3, R2, R1, R0, R11, R10, R9, R8, R7, R6, R5, R4 */
-			*pPSP = 0x0;
+			*ptr_TASK_TOS = 0x0;
 		}
 
-		PSP_OF_TASKS[task_id] = (uint32_t)pPSP;
+		Rtos_TCB[task_id].Task_TOS = (uint32_t)ptr_TASK_TOS;
 
 	}
 
@@ -183,7 +194,7 @@ __attribute__((naked)) void Switch_SP_to_PSP(void)
 	/* Preserve LR (Due to epilogue & prologue sequence)*/
 	__asm volatile ("PUSH {LR}");
 	/* Get the current PSP */
-	__asm volatile ("BL Get_PSP_Value");
+	__asm volatile ("BL Get_New_Task_TOS");
 	/* Initialise PSP */
 	__asm volatile (" MSR PSP, R0");
 	/* Retrieve LR */
@@ -202,7 +213,7 @@ __attribute__((naked)) void Switch_SP_to_PSP(void)
 
 /*------------------------------------------------------------
 |
-| Function Name: Get_PSP_Value
+| Function Name: Get_New_Task_TOS
 | Function Description: Returns TOS of task to be executed.
 |
 |-------------------------------------------------------------
@@ -216,21 +227,21 @@ __attribute__((naked)) void Switch_SP_to_PSP(void)
 | uint32_t TOS : Top of stack of task to be executed
 |
 |-------------------------------------------------------------*/
-uint32_t Get_PSP_Value(void)
+uint32_t Get_New_Task_TOS(void)
 {
-	return PSP_OF_TASKS[Current_Task];
+	return Rtos_TCB[EXECUTING_TASK].Task_TOS;
 }
 
 /*------------------------------------------------------------
 |
-| Function Name: Save_PSP_Value
+| Function Name: Save_Current_Task_TOS
 | Function Description: Save the TOS of the task that finished
 | execution.
 |
 |-------------------------------------------------------------
 |
 | Function Inputs:
-| uint32_t current_task_PSP : TOS of the task that finished
+| uint32_t current_task_tos : TOS of the task that finished
 | execution.
 |
 |-------------------------------------------------------------
@@ -239,7 +250,7 @@ uint32_t Get_PSP_Value(void)
 | void : None
 |
 |-------------------------------------------------------------*/
-void Save_PSP_Value(uint32_t current_task_PSP)
+void Save_Current_Task_TOS(uint32_t current_task_tos)
 {
-	PSP_OF_TASKS[Current_Task] = current_task_PSP;
+	Rtos_TCB[EXECUTING_TASK].Task_TOS = current_task_tos;
 }
